@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.2.1/css/bulma.min.css" rel="stylesheet">
+  <meta charset="utf-8">
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    #map {
+      height: 100%;
+    }
+  </style>
+  <title>Document</title>
+</head>
+<body>
+  <nav class="nav has-shadow">
+    <div class="container" id="nav">
+      <div class="nav-left">
+        <div class="nav-item is-tab">Gifs caught: {{nrOfCaught}}/33</div>
+        <a class="nav-item is-tab" id="show-modal" v-on:click="galleryClick">gallery</a>
+        <!-- use the modal component, pass in the prop -->
+        <modal :show.sync="showGallery" :gifs.sync="gifsCaught">
+          <!--
+            you can use custom content here to overwrite
+            default content
+          -->
+        </modal>
+      </div>
+    </div>
+  </nav>
+
+  <script type="x/template" id="modal-template">
+  <div class="modal is-active" v-show="show" transition="modal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+      <header class="modal-card-head">
+        <p class="modal-card-title">Gifs Caught Gallery</p>
+      </header>
+      <section class="modal-card-body">
+
+      <div class="columns is-gapless is-multiline">
+        <div v-for="(key, val) in gifs">
+          <div class="column is-3">
+          <figure class="image is-64x64">
+            <img style="max-width: 70px; " src="http://bennysbitches.com/gifs/{{key}}.gif" alt="{{key}}"/>
+          </figure>
+            <span class="tag is-primary">{{key}}</span>
+          </div>
+        </div>
+      </div>
+
+      </section>
+      <footer class="modal-card-foot">
+        <button class="button is-primary"
+              @click="show = false">
+              Close
+            </button>
+      </footer>
+    </div>
+  </div>
+  </script>
+
+
+  <div id="map"></div>
+  <!-- <script src="https://cdn.klokantech.com/maptilerlayer/v1/index.js"></script> -->
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA9KqIpohtPDor6N2FyJCN9Ij2QoMkaw0Y" async defer></script>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/vue/1.0.28/vue.min.js" async defer></script>
+  <script src="./scripts/app.js"></script>
+</body>
+</html>
