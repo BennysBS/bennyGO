@@ -297,7 +297,7 @@ const init = () => {
         const markerListeners = myMarkers.map(marker => {
           return addMarkerClick(marker, circle, marker.position.lat(), marker.position.lng(), nav);
         });
-        //updatePosition(map, myMarker, circle, myMarkers, markerListeners, nav);
+        updatePosition(map, myMarker, circle, myMarkers, markerListeners, nav);
       });
 
   })
