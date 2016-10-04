@@ -21,49 +21,81 @@
   <nav class="nav has-shadow">
     <div class="container" id="nav">
       <div class="nav-left">
-        <div class="nav-item is-tab">Gifs caught: {{nrOfCaught}}/33</div>
-        <a class="nav-item is-tab" id="show-modal" v-on:click="galleryClick">gallery</a>
-        <!-- use the modal component, pass in the prop -->
-        <modal :show.sync="showGallery" :gifs.sync="gifsCaught">
-          <!--
-            you can use custom content here to overwrite
-            default content
-          -->
-        </modal>
+
+        <a class="nav-item is-tab" id="show-modal" v-on:click="galleryClick">Galleri</a>
+        <modal :show.sync="showGallery" :gifs.sync="gifsCaught" :gifscaught.sync="nrOfCaught" :totalgifs.sync="totalGifs"></modal>
+
+        <a class="nav-item is-tab" id="display-modal" v-on:click="galleryIntroClick">Info</a>
+        <info :display.sync="showIntro"></info>
       </div>
     </div>
   </nav>
 
   <script type="x/template" id="modal-template">
-  <div class="modal is-active" v-show="show" transition="modal">
-    <div class="modal-background"></div>
-    <div class="modal-card">
-      <header class="modal-card-head">
-        <p class="modal-card-title">Gifs Caught Gallery</p>
-      </header>
-      <section class="modal-card-body">
+    <div class="modal is-active" v-show="show">
+      <div class="modal-background"></div>
+      <div class="modal-card">
+        <header class="modal-card-head">
 
-      <div class="columns is-gapless is-multiline">
-        <div v-for="(key, val) in gifs">
-          <div class="column is-3">
-          <figure class="image is-64x64">
-            <img style="max-width: 70px; " src="http://bennysbitches.com/gifs/{{key}}.gif" alt="{{key}}"/>
-          </figure>
-            <span class="tag is-primary">{{key}}</span>
+          <p class="modal-card-title">Galleri</p>
+          <p class="modal-card-title">Gifs fångade: {{gifscaught}}/{{totalgifs}} </p>
+        </header>
+        <section class="modal-card-body">
+
+        <div class="columns is-gapless is-multiline">
+          <div v-for="(key, val) in gifs">
+            <div class="column is-3">
+            <figure class="image is-64x64">
+              <img style="max-width: 70px; " src="http://bennysbitches.com/gifs/{{key}}.gif" alt="{{key}}"/>
+              <span class="tag is-primary">{{key}}</span>
+            </figure>
+
+            </div>
           </div>
         </div>
-      </div>
 
-      </section>
-      <footer class="modal-card-foot">
-        <button class="button is-primary"
-              @click="show = false">
-              Close
-            </button>
-      </footer>
+        </section>
+        <footer class="modal-card-foot">
+          <button class="button is-primary"
+                @click="show = false">
+                Stäng
+              </button>
+        </footer>
+      </div>
     </div>
-  </div>
   </script>
+
+
+  <script type="x/template" id="modal-template-intro">
+    <div class="modal is-active" v-show="display">
+      <div class="modal-card">
+        <header class="modal-card-head">
+
+          <p class="modal-card-title">Tutorial</p>
+        </header>
+        <section class="modal-card-body">
+          <div class="content">
+            <h1>Bakgrund!</h1>
+            <p>Bennys Bitches alla gif:ar har rymt och befinners sig i Kalmar området. <br>
+            Vi ber dig nu om hjälp att fånga dom alla! <br> Som tur så har vi satt gps trackers på alla våra gif:ar och plaserat ut dom på en karta.</p>
+            <h1>Hur spelar man?</h1>
+            <p>
+              Gå runt i Kalmar och leta efter gif:ar <br>
+              För att fånga en gif är det bara att gå till den tills den är inom din radius och sedan klicka på den för att fånga den :)
+            </p>
+          </div>
+        </section>
+        <footer class="modal-card-foot">
+          <button class="button is-primary"
+                @click="display = false">
+                Close
+              </button>
+        </footer>
+      </div>
+    </div>
+  </script>
+
+
 
 
   <div id="map"></div>

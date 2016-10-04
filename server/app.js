@@ -54,20 +54,34 @@ router.route('/user/:key')
   .get((req, res) => {
     const playerRef = db.ref(`players/${req.params.key}`);
     gifRef.once('value', function(gifs) {
+
       playerRef.once('value', function(snapshot) {
         if(snapshot.val()){
+          console.log('finns');
           res.json({
             key: req.params.key,
             data: snapshot.val(),
             allGifs: gifs.val()
           });
         }else{
-          const player = playersRef.push({ nfOfCaught: 0 });
-          res.json({
-            key: player.key,
-            data: snapshot.val(),
-            allGifs: gifs.val()
+          const player = playersRef.push({ nfOfCaught: 0 }, (e) => {
+            if(e){
+              res.status(500).json({ message: 'Error' });
+            }else{
+              const newPlayer = db.ref(`players/${player.key}`);
+              newPlayer.once('value', function(playerSnap) {
+                console.log(playerSnap.val());
+                res.json({
+                  key: player.key,
+                  data: playerSnap.val(),
+                  allGifs: gifs.val()
+                });
+              });
+
+            }
+
           });
+
         }
       }, function(e){
         console.log(e);

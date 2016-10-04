@@ -1,10 +1,13 @@
 'use strict';
 
 //let globalMarkers = [];
+const URL = 'https://richardsoderman.se/bennygo';
+//const URL = 'http://localhost:3334';
+
 
 const initMap = (pos) => {
   const mapOptions = {
-    zoom: 17,
+    zoom: 16,
     mapTypeId: google.maps.MapTypeId.ROADMAP,
     center: new google.maps.LatLng(56.675750, 16.337335),
     scrollwheel: false,
@@ -91,7 +94,7 @@ const removeMarkerFromMarkers = () => {
 const markerClick = (event, marker, circle, latLng, nav) => {
   if(circle.contains(latLng)){
     const userKey = getSavedKey();
-    getUserData('POST', `https://richardsoderman.se/bennygo/api/catch/${marker.markerId}?key=${userKey}`)
+    getUserData('POST', `${URL}/api/catch/${marker.markerId}?key=${userKey}`)
       .then(result => {
         marker.setMap(null);
         nav.$data.nrOfCaught += 1;
@@ -113,7 +116,7 @@ const placeMyPosition = (map, pos) =>{
   const circle = new google.maps.Circle({
     map: map,
     draggable: false,
-    radius: 40,    // 10 miles in metres
+    radius: 40,
     fillColor: '#00FFFF',
     strokeColor: '#00FFFF'
   });
@@ -140,7 +143,6 @@ const updatePosition = (map, myMarker, myCircle, markers, markerListeners, nav) 
   return setInterval(() => {
     getMyPosition()
       .then(pos => {
-        console.log('update pos');
         myMarker.setMap(null);
         myCircle.setMap(null);
         markerListeners.map(listener => {
@@ -150,7 +152,7 @@ const updatePosition = (map, myMarker, myCircle, markers, markerListeners, nav) 
         myMarker = marker;
         myCircle = circle;
         markerListeners = markers.map(m => {
-          return addMarkerClick(m, myCircle, marker.position.lat(), marker.position.lng(), nav);
+          return addMarkerClick(m, myCircle, m.position.lat(), m.position.lng(), nav);
         });
         map.setCenter(new google.maps.LatLng(pos.lat, pos.lng));
       });
@@ -168,21 +170,42 @@ const objectToArray = (o) => {
   return array;
 };
 
+const objectNamesToArray = (o) => {
+  const array = [];
+  for (let variable in o) {
+    if (o.hasOwnProperty(variable)) {
+      array.push(variable);
+    }
+  }
+  return array;
+};
+
+
 const removeCaughtMarkers = (caught, gifs) => {
-  return gifs.filter(g => {
-    for (let variable in caught) {
-      if(caught.hasOwnProperty(variable)) {
-        if(g.markerId === variable){
-          return false;
-        }
-        return true;
+  const g = objectNamesToArray(caught);
+  return gifs.filter(name => {
+    for (let i = 0; i < g.length; i++) {
+      if(g[i] === name.markerId){
+        return false;
       }
     }
+    return true;
   });
 };
 
 
 const vueComponents = () => {
+  Vue.component('info', {
+    template: '#modal-template-intro',
+    props: {
+      display: {
+        type: Boolean,
+        required: true,
+        twoWay: true
+      }
+    }
+  });
+
   Vue.component('modal', {
     template: '#modal-template',
     props: {
@@ -195,6 +218,16 @@ const vueComponents = () => {
         type: Object,
         required: true,
         twoWay: true
+      },
+      gifscaught: {
+        type: Number,
+        required: true,
+        twoWay: true
+      },
+      totalgifs: {
+        type: Number,
+        required: true,
+        twoWay: true
       }
     }
   });
@@ -204,21 +237,28 @@ const vueNav = (nrOfCaught) => {
     el: '#nav',
     data: {
       nrOfCaught: nrOfCaught,
+      totalGifs: 0,
       showGallery: false,
-      gifsCaught: {}//{ alien: 1, camel: 1, Chrome: 1, bird: 1, cactus: 1, dance: 1, dj: 1, frog: 1, new: 1, towel: 1}
+      gifsCaught: {},
+      showIntro: false
     },
     methods: {
       galleryClick: function(){
-        console.log('show gallery');
         const userKey = getSavedKey();
-        getUserData('GET', `https://richardsoderman.se/bennygo/api/user/${userKey}`)
+        getUserData('GET', `${URL}/api/user/${userKey}`)
           .then(result => {
             this.$data.gifsCaught = result.data.gifsCaught ? result.data.gifsCaught : {};
+            this.$data.nrOfCaught = result.data.nfOfCaught;
+            this.$data.totalGifs = objectToArray(result.allGifs).length;
           })
           .catch(e => {
 
           });
         this.$data.showGallery = true;
+      },
+
+      galleryIntroClick: function(){
+        this.$data.showIntro = true;
       }
     },
     attached: function(){
@@ -226,7 +266,6 @@ const vueNav = (nrOfCaught) => {
     }
   });
 };
-
 
 const init = () => {
   google.maps.Circle.prototype.contains = function(latLng) {
@@ -236,12 +275,14 @@ const init = () => {
   const map = initMap();
   const userKey = getSavedKey();
 
-  getUserData('GET', `https://richardsoderman.se/bennygo/api/user/${userKey}`)
+  getUserData('GET', `${URL}/api/user/${userKey}`)
     .then(result => {
-      console.log(result);
-      saveUserKey(result.key);
       const nav = vueNav(result.data.nfOfCaught);
-      //
+      if(!userKey){
+        nav.$data.showIntro = true;
+      }
+      saveUserKey(result.key);
+
 
       let gifs = objectToArray(result.allGifs);
       if(result.data.hasOwnProperty('gifsCaught')){
@@ -256,7 +297,7 @@ const init = () => {
         const markerListeners = myMarkers.map(marker => {
           return addMarkerClick(marker, circle, marker.position.lat(), marker.position.lng(), nav);
         });
-        updatePosition(map, myMarker, circle, myMarkers, markerListeners, nav);
+        //updatePosition(map, myMarker, circle, myMarkers, markerListeners, nav);
       });
 
   })
