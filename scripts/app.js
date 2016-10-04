@@ -91,7 +91,7 @@ const removeMarkerFromMarkers = () => {
 const markerClick = (event, marker, circle, latLng, nav) => {
   if(circle.contains(latLng)){
     const userKey = getSavedKey();
-    getUserData('POST', `https://richardsoderman.se:5500/api/catch/${marker.markerId}?key=${userKey}`)
+    getUserData('POST', `https://richardsoderman.se/bennygo/api/catch/${marker.markerId}?key=${userKey}`)
       .then(result => {
         marker.setMap(null);
         nav.$data.nrOfCaught += 1;
@@ -211,7 +211,7 @@ const vueNav = (nrOfCaught) => {
       galleryClick: function(){
         console.log('show gallery');
         const userKey = getSavedKey();
-        getUserData('GET', `https://richardsoderman.se:5500/api/user/${userKey}`)
+        getUserData('GET', `https://richardsoderman.se/bennygo/api/user/${userKey}`)
           .then(result => {
             this.$data.gifsCaught = result.data.gifsCaught ? result.data.gifsCaught : {};
           })
@@ -236,7 +236,7 @@ const init = () => {
   const map = initMap();
   const userKey = getSavedKey();
 
-  getUserData('GET', `https://richardsoderman.se:5500/api/user/${userKey}`)
+  getUserData('GET', `https://richardsoderman.se/bennygo/api/user/${userKey}`)
     .then(result => {
       console.log(result);
       saveUserKey(result.key);
