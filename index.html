@@ -39,6 +39,9 @@
 
     </div>
   </nav>
+  <div id="isFacebook">
+    <face :display.sync="showFacebook"></face>
+  </div>
 
 
 
@@ -126,6 +129,52 @@
               Grattis du har fångat {{gifname}} gif:en.
               <br/>
               Om du vill se alla gif:ar du har fångat <br/> finns dom att hitta i galleri.
+            </p>
+          </div>
+          <nav class="level">
+            <div class="level-left">
+              <a class="level-item">
+                <span class="icon is-small"><i class="fa fa-reply"></i></span>
+              </a>
+              <a class="level-item">
+                <span class="icon is-small"><i class="fa fa-retweet"></i></span>
+              </a>
+              <a class="level-item">
+                <span class="icon is-small"><i class="fa fa-heart"></i></span>
+              </a>
+            </div>
+          </nav>
+        </div>
+      </article>
+      <footer class="modal-card-foot">
+        <button class="button is-primary"
+              @click="display = false">
+              Stäng
+            </button>
+      </footer>
+    </div>
+  </div>
+  <button class="modal-close"
+        @click="display = false">
+        Close
+      </button>
+</div>
+  </script>
+
+  <script type="x/template" id="modal-template-facebook">
+  <div id="modal" class="modal is-active" v-show="display">
+  <div class="modal-background"></div>
+  <div class="modal-content">
+    <div class="box">
+      <article class="media">
+        <div class="media-content">
+          <div class="content">
+            <p>
+              <strong>Facebook</strong>
+              <br>
+              BennyGO fungerar inte i Facebook webbläsaren
+              <br/>
+              Var vänlig att öpnna BennyGO i din vanliga mobil webbläsare
             </p>
           </div>
           <nav class="level">
