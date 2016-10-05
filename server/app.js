@@ -29,24 +29,10 @@ firebase.initializeApp({
   },
   databaseURL: 'https://bennygo-1475253959505.firebaseio.com'
 });
+
 const db = firebase.database();
 const gifRef = db.ref('gifs');
-
-
-// gifRef.once('value', function(snapshot) {
-//   console.log('heej');
-//   console.log(snapshot.val());
-// }, function(e){
-//   console.log(e);
-// });
-
 const playersRef = db.ref('players');
-
-
-
-
-//playersRef.child('gifsCaught').push().set(0);
-
 
 const router = express.Router();
 

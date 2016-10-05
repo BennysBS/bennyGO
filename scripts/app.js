@@ -34,9 +34,10 @@ const saveUserKey = (key) => {
 
 
 const placeMarkers = (map, markers) => {
-  return markers.map((marker) => {
+  return markers.map((marker, index) => {
     const myMarker = new google.maps.Marker({
-     map: map,
+      map: map,
+     metadata: {type: 'point', id: `marker${index}`},
      markerId: marker.markerId,
      draggable: false,
      optimized: marker.optimized,
@@ -87,16 +88,17 @@ const getUserData = (action, url) =>
 });
 
 
-const removeMarkerFromMarkers = () => {
-
-};
 
 const markerClick = (event, marker, circle, latLng, nav) => {
+
   if(circle.contains(latLng)){
     const userKey = getSavedKey();
     getUserData('POST', `${URL}/api/catch/${marker.markerId}?key=${userKey}`)
       .then(result => {
+        nav.$data.name = marker.markerId;
+        nav.$data.showCongrats = true;
         marker.setMap(null);
+
         nav.$data.nrOfCaught += 1;
       })
       .catch(e => {
@@ -195,6 +197,22 @@ const removeCaughtMarkers = (caught, gifs) => {
 
 
 const vueComponents = () => {
+  Vue.component('catch', {
+    template: '#modal-template-catch',
+    props: {
+      display: {
+        type: Boolean,
+        required: true,
+        twoWay: true
+      },
+      gifname: {
+        type: String,
+        required: true,
+        twoWay: true
+      }
+    }
+  });
+
   Vue.component('info', {
     template: '#modal-template-intro',
     props: {
@@ -232,7 +250,8 @@ const vueComponents = () => {
     }
   });
 };
-const vueNav = (nrOfCaught) => {
+
+const vueNav = (nrOfCaught, map) => {
   return new Vue({
     el: '#nav',
     data: {
@@ -240,7 +259,9 @@ const vueNav = (nrOfCaught) => {
       totalGifs: 0,
       showGallery: false,
       gifsCaught: {},
-      showIntro: false
+      showIntro: false,
+      name: '',
+      showCongrats: false
     },
     methods: {
       galleryClick: function(){
@@ -259,6 +280,15 @@ const vueNav = (nrOfCaught) => {
 
       galleryIntroClick: function(){
         this.$data.showIntro = true;
+      },
+
+      okClick: function(name){
+        this.$data.name = name;
+        this.$data.showCongrats = false;
+      },
+
+      logoClick: function(){
+        map.setZoom(16);
       }
     },
     attached: function(){
@@ -277,7 +307,7 @@ const init = () => {
 
   getUserData('GET', `${URL}/api/user/${userKey}`)
     .then(result => {
-      const nav = vueNav(result.data.nfOfCaught);
+      const nav = vueNav(result.data.nfOfCaught, map);
       if(!userKey){
         nav.$data.showIntro = true;
       }
